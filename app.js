@@ -1,4 +1,4 @@
-// AIN Line 공통 v1: 날짜 도우미, 칸 정의, 저장소, 상태, 화면 모드·테마 색, 아래에서 올라오는 창
+// AIN Line 공통 v2: 날짜 도우미, 칸 정의, 저장소, 상태, 화면 모드·테마 색, 아래에서 올라오는 창
 
 const STORE_KEY = 'ainLine';
 const appEl = document.getElementById('app');
@@ -57,7 +57,7 @@ function weekLabelsHtml() {
 let state = {
   entries: {},
   questions: [],
-  // theme: light | dark | auto (기기마다), accent: blue | green | red, weekStart: 0 | 1 (계정마다)
+  // theme: light | dark | auto (기기마다), accent: blue | green | red | yellow, weekStart: 0 | 1 (계정마다)
   settings: { theme: 'auto', accent: 'blue', weekStart: 0 }
 };
 
@@ -108,7 +108,7 @@ function applyTheme() {
   const root = document.documentElement;
   if (mode === 'light' || mode === 'dark') root.setAttribute('data-theme', mode);
   else root.removeAttribute('data-theme');
-  if (accent === 'green' || accent === 'red') root.setAttribute('data-accent', accent);
+  if (accent === 'green' || accent === 'red' || accent === 'yellow') root.setAttribute('data-accent', accent);
   else root.removeAttribute('data-accent');
 }
 

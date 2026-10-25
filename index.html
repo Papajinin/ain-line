@@ -15,20 +15,20 @@
     try {
       const s = JSON.parse(localStorage.getItem('ainLine')).settings;
       if (s.theme === 'light' || s.theme === 'dark') document.documentElement.setAttribute('data-theme', s.theme);
-      if (s.accent === 'green' || s.accent === 'red') document.documentElement.setAttribute('data-accent', s.accent);
+      if (s.accent === 'green' || s.accent === 'red' || s.accent === 'yellow') document.documentElement.setAttribute('data-accent', s.accent);
     } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
-  <!-- 시작 화면 (앱을 새로 열 때만, 약 2초): 파란 원이 펼쳐지고 → 글 세 줄이 한 줄씩 쓰임 → 이름 → 색 점 3개 (네 앱 공통 순서) -->
+  <!-- 시작 화면 (앱을 새로 열 때만, 약 2초): 파란 원이 펼쳐지고 → 글 세 줄이 한 줄씩 쓰임 → 이름 → 색 점 4개 (네 앱 공통 순서) -->
   <div class="splash" id="splash" aria-hidden="true">
     <div class="splash-mark">
       <div class="splash-disc">
         <svg viewBox="0 0 64 64"><circle class="splash-bg" cx="32" cy="32" r="32"/><path class="splash-draw" pathLength="100" d="M19 23 H45" style="--at:0.55s;--d:0.18s"/><path class="splash-draw" pathLength="100" d="M19 32 H45" style="--at:0.73s;--d:0.18s"/><path class="splash-draw" pathLength="100" d="M19 41 H35" style="--at:0.91s;--d:0.14s"/></svg>
       </div>
       <div class="wordmark splash-word"><b>AIN</b> Line</div>
-      <div class="splash-dots"><i></i><i></i><i></i></div>
+      <div class="splash-dots"><i></i><i></i><i></i><i></i></div>
     </div>
   </div>
 
@@ -70,6 +70,7 @@
           <button type="button" data-v="blue"><i class="sw" style="background:#0071E3"></i>블루</button>
           <button type="button" data-v="green"><i class="sw" style="background:#00B74F"></i>그린</button>
           <button type="button" data-v="red"><i class="sw" style="background:#D31E3D"></i>레드</button>
+          <button type="button" data-v="yellow"><i class="sw" style="background:#FFCC00"></i>옐로</button>
         </div></div></div>
         <p class="hint">버튼과 강조 색이 바뀌어요. 이 계정의 모든 기기에 같이 적용돼요.</p>
 
@@ -144,7 +145,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="app.js?v=1"></script>
+  <script src="app.js?v=2"></script>
   <script src="write.js?v=1"></script>
   <script src="recall.js?v=1"></script>
   <script src="sheet.js?v=1"></script>
