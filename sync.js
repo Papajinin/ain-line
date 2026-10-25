@@ -8,12 +8,12 @@
 
 // Firebase 관리 화면 → 프로젝트 설정 → 내 앱(웹)에서 복사해 넣는 값
 const FIREBASE_CONFIG = {
-  apiKey: '',
-  authDomain: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: ''
+  apiKey: 'AIzaSyCb9tbEkZBPEkICsstaaQoTwpfNeHD1XEA',
+  authDomain: 'ain-line.firebaseapp.com',
+  projectId: 'ain-line',
+  storageBucket: 'ain-line.firebasestorage.app',
+  messagingSenderId: '67052816003',
+  appId: '1:67052816003:web:180d18b8475d15b383bdb6'
 };
 
 const UID_KEY = 'ainLine.uid';          // 이 기기에 마지막으로 로그인한 사람
