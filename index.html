@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- 홈 화면 앱: 상태 표시줄을 화면과 겹치지 않게 따로 두고, 아이콘 이름은 AIN Line -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="AIN Line">
+  <title>AIN Line</title>
+  <script>
+    // 저장된 화면 모드와 테마 색을 먼저 적용해서 색이 깜빡이지 않게
+    try {
+      const s = JSON.parse(localStorage.getItem('ainLine')).settings;
+      if (s.theme === 'light' || s.theme === 'dark') document.documentElement.setAttribute('data-theme', s.theme);
+      if (s.accent === 'green' || s.accent === 'red') document.documentElement.setAttribute('data-accent', s.accent);
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+  <!-- 화면 (쓰기 / 읽기 / 돌아보기 / 찾기): 그때그때 그림 -->
+  <div class="app" id="app"></div>
+
+  <!-- 날짜 고르기 창 (쓰기 화면의 날짜를 누르면) -->
+  <div class="overlay" id="dateOverlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dateTitle">
+      <div class="sheet-top">
+        <span></span>
+        <h2 id="dateTitle">날짜 고르기</h2>
+        <button class="sheet-btn strong" id="dateClose" type="button">닫기</button>
+      </div>
+      <div class="sheet-scroll">
+        <div class="cal in-sheet" id="dateCal"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설정 창 -->
+  <div class="overlay" id="settingsOverlay" hidden>
+    <div class="sheet tall" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="sheet-top">
+        <span></span>
+        <h2 id="settingsTitle">설정</h2>
+        <button class="sheet-btn strong" id="settingsClose" type="button">완료</button>
+      </div>
+      <div class="sheet-scroll">
+        <div class="group-label">화면 모드</div>
+        <div class="group"><div class="row"><div class="seg wide grow" id="sTheme">
+          <button type="button" data-v="light">라이트</button>
+          <button type="button" data-v="dark">다크</button>
+          <button type="button" data-v="auto">자동</button>
+        </div></div></div>
+
+        <div class="group-label">테마 색</div>
+        <div class="group"><div class="row"><div class="seg wide grow" id="sAccent">
+          <button type="button" data-v="blue"><i class="sw" style="background:#0071E3"></i>블루</button>
+          <button type="button" data-v="green"><i class="sw" style="background:#00B74F"></i>그린</button>
+          <button type="button" data-v="red"><i class="sw" style="background:#D31E3D"></i>레드</button>
+        </div></div></div>
+        <p class="hint">버튼과 강조 색이 바뀌어요. 이 계정의 모든 기기에 같이 적용돼요.</p>
+
+        <div class="group-label">한 주의 시작</div>
+        <div class="group"><div class="row"><div class="seg wide grow" id="sWeek">
+          <button type="button" data-v="0">일요일</button>
+          <button type="button" data-v="1">월요일</button>
+        </div></div></div>
+        <p class="hint">돌아보기와 날짜 고르기의 달력에 적용돼요.</p>
+
+        <div class="group-label">내 질문</div>
+        <div class="group" id="sQuestions"></div>
+        <p class="hint">매일 T와 M 사이에 나와요. 최대 3개까지 만들 수 있고, 꾹 눌러서 순서를 바꿔요.</p>
+
+        <div id="sAccount">
+          <div class="group-label">계정</div>
+          <div class="group">
+            <div class="row"><span>로그인</span><span class="row-value" id="accountEmail"></span></div>
+            <button class="row danger" id="logoutBtn" type="button">로그아웃</button>
+          </div>
+        </div>
+        <p class="hint" id="localNote" hidden>아직 클라우드에 연결하기 전이라 기록이 이 기기에만 저장돼요.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 내 질문 추가·고치기 창 -->
+  <div class="overlay" id="questionOverlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="qTitle">
+      <div class="sheet-top">
+        <button class="sheet-btn" id="qCancel" type="button">취소</button>
+        <h2 id="qTitle">질문 추가</h2>
+        <button class="sheet-btn strong" id="qSave" type="button">추가</button>
+      </div>
+      <div class="sheet-scroll">
+        <div class="group">
+          <label class="in-row"><span>글자</span><input class="letter-in" id="qLetter" type="text" maxlength="2" placeholder="R" autocapitalize="characters" autocomplete="off" enterkeyhint="next"></label>
+          <label class="in-row"><span>질문</span><input id="qName" type="text" maxlength="40" placeholder="예: 오늘 읽은 책" autocomplete="off" enterkeyhint="next"></label>
+          <label class="in-row"><span>안내 글</span><input id="qPh" type="text" maxlength="40" placeholder="안 써도 돼요" autocomplete="off" enterkeyhint="done"></label>
+        </div>
+        <p class="f-error" id="qError" hidden></p>
+        <p class="hint">글자는 영어 한 글자예요. 안내 글은 칸이 비어 있을 때 흐리게 보여요.</p>
+        <div id="qEditOnly">
+          <div class="group"><button class="row danger" id="qDelete" type="button">질문 삭제</button></div>
+          <p class="hint">지워도 이미 쓴 글은 그날 기록에 그대로 남아요.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 로그인 화면 -->
+  <div class="login" id="login" hidden>
+    <div class="login-box">
+      <h1 class="wordmark big"><b>AIN</b> Line</h1>
+      <p class="login-sub">가족 계정으로 로그인해 주세요</p>
+      <button class="add-btn" id="loginBtn" type="button">Google로 로그인</button>
+      <p class="f-error login-error" id="loginError" hidden></p>
+    </div>
+  </div>
+
+  <!-- 선택 창 (질문 삭제·로그아웃 확인) -->
+  <div class="overlay" id="actionOverlay" hidden>
+    <div class="action-sheet">
+      <div class="action-group">
+        <p class="action-msg" id="actionMsg"></p>
+        <div id="actionBtns"></div>
+      </div>
+      <button class="action-cancel" id="actionCancel" type="button">취소</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="app.js?v=1"></script>
+  <script src="write.js?v=1"></script>
+  <script src="recall.js?v=1"></script>
+  <script src="sheet.js?v=1"></script>
+  <script src="settings.js?v=1"></script>
+  <script src="sync.js?v=1"></script>
+  <script src="main.js?v=1"></script>
+</body>
+</html>

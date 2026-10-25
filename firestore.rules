@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// AIN Line: 허용한 구글 계정만, 자기 일기만 읽고 쓸 수 있음
+// 가족이 늘면 아래 목록에 이메일을 추가한 뒤 Firebase 관리 화면 → Firestore → 규칙에 붙여 넣고 "게시"
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isFamily() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'aristo0517@gmail.com',    // 아빠
+          'loveygsa0215@gmail.com',  // 아내
+          'ahini0215@gmail.com'      // 딸
+        ];
+    }
+    function isOwner(uid) {
+      return isFamily() && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+      match /entries/{day} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+  }
+}
