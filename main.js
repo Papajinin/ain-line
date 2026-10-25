@@ -1,4 +1,4 @@
-// AIN Line 시작 v1: 화면 고르기·그리기, 누르기 처리, 날짜 바뀜, 클라우드 시작
+// AIN Line 시작 v2: 화면 고르기·그리기, 누르기 처리, 날짜 바뀜, 시작 화면, 클라우드 시작
 
 function render() {
   if (ui.view === 'read') appEl.innerHTML = readHtml();
@@ -54,7 +54,23 @@ document.addEventListener('visibilitychange', () => {
   render();
 });
 
+// 시작 화면: 첫 화면을 다 그린 뒤에 움직이기 시작 → 약 1.8초 움직이고 잠깐 두었다가 사라짐
+// 클라우드 연결은 움직임이 거의 끝난 뒤에 시작해서 끊기지 않게 (AIN Days와 같은 방법)
+let splashStarted = false;
+function startSplash() {
+  if (splashStarted) return;
+  splashStarted = true;
+  const splash = document.getElementById('splash');
+  splash.classList.add('go');
+  setTimeout(initCloud, 1700);
+  setTimeout(() => {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 400);
+  }, 2000);
+}
+
 loadState(); // 기기에 저장된 내용으로 먼저 보여 주고, 클라우드에서 최신 내용을 받으면 다시 그림
 applyTheme();
 render();
-initCloud();
+requestAnimationFrame(() => requestAnimationFrame(startSplash)); // 첫 화면이 그려진 다음 장면부터
+setTimeout(startSplash, 1000); // 화면 그리기 신호가 오지 않는 경우(백그라운드에서 열림 등) 대비

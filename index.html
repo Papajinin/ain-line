@@ -7,6 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="AIN Line">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="apple-touch-icon.png">
   <title>AIN Line</title>
   <script>
     // 저장된 화면 모드와 테마 색을 먼저 적용해서 색이 깜빡이지 않게
@@ -16,9 +18,20 @@
       if (s.accent === 'green' || s.accent === 'red') document.documentElement.setAttribute('data-accent', s.accent);
     } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css?v=1">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
+  <!-- 시작 화면 (앱을 새로 열 때만, 약 2초): 파란 원이 펼쳐지고 → 글 세 줄이 한 줄씩 쓰임 → 이름 → 색 점 3개 (네 앱 공통 순서) -->
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-mark">
+      <div class="splash-disc">
+        <svg viewBox="0 0 64 64"><circle class="splash-bg" cx="32" cy="32" r="32"/><path class="splash-draw" pathLength="100" d="M19 23 H45" style="--at:0.55s;--d:0.18s"/><path class="splash-draw" pathLength="100" d="M19 32 H45" style="--at:0.73s;--d:0.18s"/><path class="splash-draw" pathLength="100" d="M19 41 H35" style="--at:0.91s;--d:0.14s"/></svg>
+      </div>
+      <div class="wordmark splash-word"><b>AIN</b> Line</div>
+      <div class="splash-dots"><i></i><i></i><i></i></div>
+    </div>
+  </div>
+
   <!-- 화면 (쓰기 / 읽기 / 돌아보기 / 찾기): 그때그때 그림 -->
   <div class="app" id="app"></div>
 
@@ -137,6 +150,6 @@
   <script src="sheet.js?v=1"></script>
   <script src="settings.js?v=1"></script>
   <script src="sync.js?v=1"></script>
-  <script src="main.js?v=1"></script>
+  <script src="main.js?v=2"></script>
 </body>
 </html>
