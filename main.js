@@ -1,4 +1,4 @@
-// AIN Line 시작 v2: 화면 고르기·그리기, 누르기 처리, 날짜 바뀜, 시작 화면, 클라우드 시작
+// AIN Line 시작 v3: 화면 고르기·그리기, 누르기 처리, 날짜 바뀜, 시작 화면, 클라우드 시작
 
 function render() {
   if (ui.view === 'read') appEl.innerHTML = readHtml();
@@ -66,6 +66,7 @@ function startSplash() {
   setTimeout(() => {
     splash.classList.add('hide');
     setTimeout(() => splash.remove(), 400);
+    lockStart(); // 잠금이 켜져 있으면 Face ID·지문 확인 창을 저절로 띄움
   }, 2000);
 }
 

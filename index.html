@@ -18,7 +18,7 @@
       if (s.accent === 'green' || s.accent === 'red' || s.accent === 'yellow') document.documentElement.setAttribute('data-accent', s.accent);
     } catch (e) {}
   </script>
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <!-- 시작 화면 (앱을 새로 열 때만, 약 2초): 파란 원이 펼쳐지고 → 글 세 줄이 한 줄씩 쓰임 → 이름 → 색 점 4개 (네 앱 공통 순서) -->
@@ -85,6 +85,13 @@
         <div class="group" id="sQuestions"></div>
         <p class="hint">매일 T와 M 사이에 나와요. 최대 3개까지 만들 수 있고, 꾹 눌러서 순서를 바꿔요.</p>
 
+        <div class="group-label">잠금</div>
+        <div class="group"><div class="row"><div class="seg wide grow" id="sLockSeg">
+          <button type="button" data-v="off">끄기</button>
+          <button type="button" data-v="on">켜기</button>
+        </div></div></div>
+        <p class="hint" id="lockHint">켜면 앱을 열 때, 그리고 1분 넘게 내려 두었다 돌아올 때 Face ID·지문을 물어봐요. 이 기기에만 적용돼요.</p>
+
         <div id="sAccount">
           <div class="group-label">계정</div>
           <div class="group">
@@ -131,6 +138,18 @@
     </div>
   </div>
 
+  <!-- 잠금 화면 (Face ID·지문) -->
+  <div class="login lock-screen" id="appLock" hidden>
+    <div class="login-box">
+      <div class="lock-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+      <h1 class="wordmark big"><b>AIN</b> Line</h1>
+      <p class="login-sub">잠겨 있어요</p>
+      <p class="f-error login-error" id="lockError" hidden>확인하지 못했어요. 다시 눌러 주세요.</p>
+      <button class="add-btn" id="unlockBtn" type="button">잠금 풀기</button>
+      <button class="text-btn" id="lockRelogin" type="button">구글 로그인 다시 하기</button>
+    </div>
+  </div>
+
   <!-- 선택 창 (질문 삭제·로그아웃 확인) -->
   <div class="overlay" id="actionOverlay" hidden>
     <div class="action-sheet">
@@ -151,6 +170,7 @@
   <script src="sheet.js?v=1"></script>
   <script src="settings.js?v=1"></script>
   <script src="sync.js?v=2"></script>
-  <script src="main.js?v=2"></script>
+  <script src="lock.js?v=1"></script>
+  <script src="main.js?v=3"></script>
 </body>
 </html>
