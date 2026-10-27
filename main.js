@@ -1,4 +1,4 @@
-// AIN Line 시작 v3: 화면 고르기·그리기, 누르기 처리, 날짜 바뀜, 시작 화면, 클라우드 시작
+// AIN Line 시작 v4: 화면 고르기·그리기, 누르기 처리, 날짜 바뀜, 시작 화면, 클라우드 시작
 
 function render() {
   if (ui.view === 'read') appEl.innerHTML = readHtml();
@@ -33,8 +33,8 @@ appEl.addEventListener('click', e => {
   if (d.go === 'recall') { ui.calMonth = null; return go('recall'); }
   if (d.go) return go(d.go);
   if (d.back !== undefined) return goBack();
-  if (d.step) { moveDay(ymd(addDays(parseYmd(ui.sel), Number(d.step)))); return window.scrollTo(0, 0); }
-  if (d.today !== undefined) { moveDay(ui.today, 'slide-next'); return window.scrollTo(0, 0); }
+  if (d.step) return moveDay(ymd(addDays(parseYmd(ui.sel), Number(d.step))));
+  if (d.today !== undefined) return moveDay(ui.today);
   if (d.pick !== undefined) return openDatePicker();
   if (d.read) { ui.readFrom = ui.view === 'search' ? 'search' : 'recall'; ui.readKey = d.read; return go('read'); }
   if (d.edit !== undefined) { ui.sel = ui.readKey; return go('write'); }

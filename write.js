@@ -1,4 +1,4 @@
-// AIN Line 쓰기 화면 v2: 날짜 줄, 어제의 T, 칸(K H G P T · 내 질문 · M), 자동 저장, 날짜 고르기 창, 옆으로 쓸어 날짜 옮기기
+// AIN Line 쓰기 화면 v3: 날짜 줄, 어제의 T, 칸(K H G P T · 내 질문 · M), 자동 저장, 날짜 고르기 창, 날짜 넘기기(버튼·옆으로 쓸기, Todo 캘린더 방식)
 
 let writeFields = []; // 지금 그린 칸 목록 (칸 순서 = data-f 번호)
 
@@ -22,26 +22,69 @@ function writeHtml() {
       </div>
     </header>
     <div class="date-bar">
-      <button type="button" class="date-title day-anim" data-pick aria-label="날짜 고르기">${dateLabel(k)}</button>
+      <button type="button" class="date-title" data-pick aria-label="날짜 고르기">${dateLabel(k)}</button>
       ${isToday ? '' : '<button type="button" class="today-btn" data-today>오늘</button>'}
       <div class="arrows">
         <button class="nav-btn" type="button" data-step="-1" aria-label="전날">${ICONS.back}</button>
         <button class="nav-btn" type="button" data-step="1" aria-label="다음날"${isToday ? ' disabled' : ''}>${ICONS.next}</button>
       </div>
     </div>
-    ${yT ? `<div class="yesterday day-anim"><small>어제 시도해보기로 한 것</small>${escapeHtml(yT)}</div>` : ''}
-    <div class="fields day-anim">${fields}</div>`;
+    <div class="day-pane">
+      ${yT ? `<div class="yesterday"><small>어제 시도해보기로 한 것</small>${escapeHtml(yT)}</div>` : ''}
+      <div class="fields">${fields}</div>
+    </div>`;
 }
 
 // 날짜 옮기기 (미래로는 못 감)
-function moveDay(k, anim) {
+// AIN Todo 캘린더처럼: 지금 날이 옆으로 밀려나고, 새 날이 반대쪽에서 들어온다 (버튼·쓸기·날짜 고르기 모두)
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let sliding = false;
+let paneX = 0; // 손가락을 따라 옮긴 거리
+
+function moveDay(k) {
   if (k > ui.today) k = ui.today;
-  if (k === ui.sel && ui.view === 'write') return;
+  if (sliding || (k === ui.sel && ui.view === 'write')) return;
   flushSave();
-  ui.anim = anim || (k < ui.sel ? 'slide-prev' : 'slide-next');
+  const pane = appEl.querySelector('.day-pane');
+  if (ui.view !== 'write' || !pane || reduceMotion) return showDay(k);
+  slideDay(k < ui.sel ? -1 : 1, k);
+}
+function showDay(k) {
   ui.sel = k;
   ui.view = 'write';
   render();
+  window.scrollTo(0, 0);
+}
+function setPane(pane, x, ms, ease) {
+  pane.style.transition = ms ? `transform ${ms}ms ${ease}` : 'none';
+  pane.style.transform = x ? `translateX(${x}px)` : '';
+  paneX = x;
+}
+function slideDay(dir, k) {
+  sliding = true;
+  appEl.classList.remove('enter');
+  let pane = appEl.querySelector('.day-pane');
+  const w = pane.clientWidth;
+  const outMs = Math.round(80 + 140 * (1 - Math.min(Math.abs(paneX) / w, 1)));
+  setPane(pane, -dir * w, outMs, 'ease-in');
+  setTimeout(() => {
+    showDay(k);
+    pane = appEl.querySelector('.day-pane');
+    setPane(pane, dir * w, 0);
+    pane.offsetHeight; // 새 날을 반대쪽에 먼저 놓기
+    setPane(pane, 0, 240, 'ease-out');
+    setTimeout(() => {
+      pane.style.transition = '';
+      sliding = false;
+    }, 250);
+  }, outMs);
+}
+// 덜 밀었으면 제자리로
+function snapBack() {
+  const pane = appEl.querySelector('.day-pane');
+  if (!pane) return;
+  setPane(pane, 0, 200, 'ease-out');
+  setTimeout(() => { pane.style.transition = ''; }, 210);
 }
 
 // 칸 높이: 글이 늘면 부드럽게 늘어남 (처음 그릴 때는 바로)
@@ -111,24 +154,58 @@ document.getElementById('dateClose').addEventListener('click', () => hideOverlay
 dateOverlay.addEventListener('click', e => { if (e.target === dateOverlay) hideOverlay(dateOverlay); });
 
 // ---------- 옆으로 쓸어 날짜 옮기기 ----------
-// 오른쪽으로 쓸면 전날, 왼쪽으로 쓸면 다음날. 글 칸 안에서 시작한 쓸기는 무시 (커서 옮기기와 겹치지 않게)
+// 오른쪽으로 쓸면 전날, 왼쪽으로 쓸면 다음날. 쓰는 동안 손가락을 따라 움직임 (AIN Todo 캘린더와 같은 기준)
+// 글 칸 안에서 시작한 쓸기는 무시 (커서 옮기기와 겹치지 않게)
 let swipe = null;
+let swipedAt = 0;
+
 appEl.addEventListener('touchstart', e => {
   swipe = null;
-  if (ui.view !== 'write' || e.touches.length !== 1) return;
+  if (sliding || ui.view !== 'write' || e.touches.length !== 1) return;
   if (e.target.closest('.f-input') || document.body.classList.contains('locked')) return;
   const p = e.touches[0];
-  swipe = { x: p.clientX, y: p.clientY };
+  swipe = { x: p.clientX, y: p.clientY, time: Date.now(), axis: null };
 }, { passive: true });
+
+appEl.addEventListener('touchmove', e => {
+  if (!swipe) return;
+  const p = e.touches[0];
+  const dx = p.clientX - swipe.x, dy = p.clientY - swipe.y;
+  if (!swipe.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8) {
+    swipe.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    swipedAt = Date.now();
+    if (swipe.axis === 'x') appEl.classList.remove('enter');
+  }
+  if (swipe.axis === 'x' && !reduceMotion) {
+    const pane = appEl.querySelector('.day-pane');
+    // 오늘에서 다음날 쪽으로는 조금만 끌려옴 (못 간다는 느낌)
+    if (pane) setPane(pane, dx < 0 && ui.sel === ui.today ? dx / 4 : dx, 0);
+  }
+}, { passive: true });
+
 appEl.addEventListener('touchend', e => {
   if (!swipe) return;
   const p = e.changedTouches[0];
-  const dx = p.clientX - swipe.x, dy = p.clientY - swipe.y;
+  const dx = p.clientX - swipe.x;
+  const fast = Math.abs(dx) / Math.max(Date.now() - swipe.time, 1) > 0.4; // 휙 넘긴 경우
+  const axis = swipe.axis;
   swipe = null;
-  if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return; // 짧거나 비스듬하면 스크롤로 봄
-  const step = dx > 0 ? -1 : 1;
-  if (step > 0 && ui.sel === ui.today) return;
-  moveDay(ymd(addDays(parseYmd(ui.sel), step)));
-  window.scrollTo(0, 0);
+  if (axis) swipedAt = Date.now();
+  if (axis !== 'x') return;
+  const pane = appEl.querySelector('.day-pane');
+  const far = pane && Math.abs(dx) > pane.clientWidth * 0.25;
+  const step = dx < 0 ? 1 : -1;
+  if ((far || (fast && Math.abs(dx) > 30)) && !(step > 0 && ui.sel === ui.today)) {
+    moveDay(ymd(addDays(parseYmd(ui.sel), step)));
+  } else if (!reduceMotion) snapBack();
 }, { passive: true });
-appEl.addEventListener('touchcancel', () => { swipe = null; }, { passive: true });
+
+appEl.addEventListener('touchcancel', () => {
+  if (swipe && swipe.axis === 'x') snapBack();
+  swipe = null;
+}, { passive: true });
+
+// 쓸고 난 손가락이 버튼 위에서 떨어져도 눌린 것으로 치지 않음
+appEl.addEventListener('click', e => {
+  if (Date.now() - swipedAt < 400) { e.stopPropagation(); e.preventDefault(); }
+}, true);

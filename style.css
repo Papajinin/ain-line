@@ -118,6 +118,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
   padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
+  overflow-x: clip; /* 날짜를 옆으로 밀어낼 때 화면이 옆으로 밀리지 않게 */
 }
 
 /* ---------- 헤더 ---------- */
@@ -345,21 +346,17 @@ body.locked { overflow: hidden; }
 .action-cancel { font-weight: 600; }
 
 
-/* Line 화면 움직임: 화면이 살짝 떠오르며 바뀜, 날짜를 넘기면 옆으로 밀림, 찾은 결과는 천천히 나타남 */
+/* Line 화면 움직임: 화면이 살짝 떠오르며 바뀜, 찾은 결과는 천천히 나타남 (날짜 넘기기는 write.js에서 옆으로 밀어냄) */
 .app.enter > :not(.top) { animation: rise var(--t) var(--ease) both; }
-.app.slide-prev .day-anim { animation: from-left var(--t) var(--ease) both; }
-.app.slide-next .day-anim { animation: from-right var(--t) var(--ease) both; }
 .fade-in { animation: fade var(--t) var(--ease) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
-@keyframes from-left { from { opacity: 0; transform: translateX(-18px); } }
-@keyframes from-right { from { opacity: 0; transform: translateX(18px); } }
 @keyframes fade { from { opacity: 0; } }
 .mcard, .date-title { transition: transform var(--t) var(--ease); }
 .mcard:active, .date-title:active { transform: scale(.95); transition-duration: var(--t-press); }
 .li, .res, .q-open, button.row, button.cd .n { transition: background-color var(--t) var(--ease); }
 .li:active, .res:active, .q-open:active, button.row:active { background: var(--fill); transition-duration: var(--t-press); }
 @media (prefers-reduced-motion: reduce) {
-  .app.enter > *, .day-anim, .fade-in { animation: none !important; }
+  .app.enter > *, .fade-in { animation: none !important; }
   .field, .letter, .f-input, .mcard, .date-title, .li, .res, .q-open, button.row, .cd .n, .overlay, .sheet, .action-sheet { transition: none; }
   .q-row { transition: none !important; }
 }

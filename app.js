@@ -1,4 +1,4 @@
-// AIN Line 공통 v2: 날짜 도우미, 칸 정의, 저장소, 상태, 화면 모드·테마 색, 아래에서 올라오는 창
+// AIN Line 공통 v3: 날짜 도우미, 칸 정의, 저장소, 상태, 화면 모드·테마 색, 아래에서 올라오는 창
 
 const STORE_KEY = 'ainLine';
 const appEl = document.getElementById('app');
@@ -70,7 +70,7 @@ const ui = {
   readFrom: 'recall',  // 읽기에서 뒤로 가면 갈 곳
   calMonth: null,      // 돌아보기 달력의 달 (Date, 그달 1일)
   q: '',               // 찾는 글자
-  anim: ''             // 다음 그리기 한 번만 쓰는 움직임 (enter, slide-prev, slide-next)
+  anim: ''             // 다음 그리기 한 번만 쓰는 움직임 (enter)
 };
 
 function loadState() {
