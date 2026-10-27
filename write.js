@@ -1,4 +1,4 @@
-// AIN Line 쓰기 화면 v1: 날짜 줄, 어제의 T, 칸(K H G P T · 내 질문 · M), 자동 저장, 날짜 고르기 창
+// AIN Line 쓰기 화면 v2: 날짜 줄, 어제의 T, 칸(K H G P T · 내 질문 · M), 자동 저장, 날짜 고르기 창, 옆으로 쓸어 날짜 옮기기
 
 let writeFields = []; // 지금 그린 칸 목록 (칸 순서 = data-f 번호)
 
@@ -109,3 +109,26 @@ dateCal.addEventListener('click', e => {
 });
 document.getElementById('dateClose').addEventListener('click', () => hideOverlay(dateOverlay));
 dateOverlay.addEventListener('click', e => { if (e.target === dateOverlay) hideOverlay(dateOverlay); });
+
+// ---------- 옆으로 쓸어 날짜 옮기기 ----------
+// 오른쪽으로 쓸면 전날, 왼쪽으로 쓸면 다음날. 글 칸 안에서 시작한 쓸기는 무시 (커서 옮기기와 겹치지 않게)
+let swipe = null;
+appEl.addEventListener('touchstart', e => {
+  swipe = null;
+  if (ui.view !== 'write' || e.touches.length !== 1) return;
+  if (e.target.closest('.f-input') || document.body.classList.contains('locked')) return;
+  const p = e.touches[0];
+  swipe = { x: p.clientX, y: p.clientY };
+}, { passive: true });
+appEl.addEventListener('touchend', e => {
+  if (!swipe) return;
+  const p = e.changedTouches[0];
+  const dx = p.clientX - swipe.x, dy = p.clientY - swipe.y;
+  swipe = null;
+  if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return; // 짧거나 비스듬하면 스크롤로 봄
+  const step = dx > 0 ? -1 : 1;
+  if (step > 0 && ui.sel === ui.today) return;
+  moveDay(ymd(addDays(parseYmd(ui.sel), step)));
+  window.scrollTo(0, 0);
+}, { passive: true });
+appEl.addEventListener('touchcancel', () => { swipe = null; }, { passive: true });
