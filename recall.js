@@ -1,7 +1,8 @@
-// AIN Line 돌아보기 v1: 그날의 기록 카드, 달력, 그달 목록, 찾기, 지난 기록 읽기
+// AIN Line 돌아보기 v2 (일요일·공휴일 빨간 날짜): 그날의 기록 카드, 달력, 그달 목록, 찾기, 지난 기록 읽기
 
 // 달력 (돌아보기, 날짜 고르기 창이 같이 씀)
-//  - 쓴 날은 은은한 테마 색 동그라미. 빨간 표시·빠뜨린 날 표시는 없음
+//  - 쓴 날은 은은한 테마 색 동그라미. 빠뜨린 날 표시는 없음. 일요일·공휴일은 빨간 숫자
+//  - 날짜 고르기 창도 고른 날 표시 없음 (누르면 바로 그날로 넘어가니까)
 //  - pick: 날짜 고르기 창 (지난날 모두 누를 수 있음). 아니면 쓴 날만 눌러서 읽기
 function calHtml(month, opts) {
   const y = month.getFullYear(), m = month.getMonth();
@@ -16,7 +17,7 @@ function calHtml(month, opts) {
   for (let d = 1; d <= last; d++) {
     const k = ymd(new Date(y, m, d));
     const has = hasEntry(k);
-    const cls = ['cd', has ? 'has' : '', k === ui.today ? 'today' : '', k === opts.sel ? 'sel' : ''].join(' ');
+    const cls = ['cd', has ? 'has' : '', isRedDay(k) ? 'red' : '', k === ui.today ? 'today' : ''].join(' ');
     if (k > ui.today) cells += `<button type="button" class="${cls}" disabled><span class="n">${d}</span></button>`;
     else if (opts.pick) cells += `<button type="button" class="${cls}" data-date="${k}"><span class="n">${d}</span></button>`;
     else if (has) cells += `<button type="button" class="${cls}" data-read="${k}" aria-label="${dateLabel(k)}"><span class="n">${d}</span></button>`;
@@ -79,7 +80,7 @@ function recallHtml() {
   const prefix = `${y}-${String(m + 1).padStart(2, '0')}-`;
   const rows = Object.keys(state.entries).filter(k => k.startsWith(prefix) && hasEntry(k)).sort().reverse().map(k => {
     const d = parseYmd(k);
-    return `<button type="button" class="li" data-read="${k}"><span class="d num">${d.getMonth() + 1}/${d.getDate()} ${WEEK_NAMES[d.getDay()]}</span><span class="t">${escapeHtml(entryTitle(k))}</span>${ICONS.next}</button>`;
+    return `<button type="button" class="li" data-read="${k}"><span class="d num${isRedDay(k) ? ' red' : ''}">${d.getMonth() + 1}/${d.getDate()} ${WEEK_NAMES[d.getDay()]}</span><span class="t">${escapeHtml(entryTitle(k))}</span>${ICONS.next}</button>`;
   }).join('');
   return `
     ${subTop('돌아보기', `<button class="icon-btn end" type="button" data-go="search" aria-label="찾기"><span class="icon-circle">${ICONS.search}</span></button>`)}
@@ -136,7 +137,7 @@ function searchResHtml() {
   const rows = hits.map(h => {
     const d = parseYmd(h.k);
     return `<button type="button" class="res" data-read="${h.k}">
-      <span class="rh"><span class="num">${shortDate(d)} ${WEEK_NAMES[d.getDay()]}</span><span class="letter sm">${escapeHtml(h.f.k)}</span><span class="rn">${escapeHtml(h.f.name)}</span></span>
+      <span class="rh"><span class="num${isRedDay(h.k) ? ' red' : ''}">${shortDate(d)} ${WEEK_NAMES[d.getDay()]}</span><span class="letter sm">${escapeHtml(h.f.k)}</span><span class="rn">${escapeHtml(h.f.name)}</span></span>
       <p>${markHtml(h.t, q)}</p>
     </button>`;
   }).join('');

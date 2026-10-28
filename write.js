@@ -1,4 +1,4 @@
-// AIN Line 쓰기 화면 v3: 날짜 줄, 어제의 T, 칸(K H G P T · 내 질문 · M), 자동 저장, 날짜 고르기 창, 날짜 넘기기(버튼·옆으로 쓸기, Todo 캘린더 방식)
+// AIN Line 쓰기 화면 v4 (날짜 제목에 공휴일 이름): 날짜 줄, 어제의 T, 칸(K H G P T · 내 질문 · M), 자동 저장, 날짜 고르기 창, 날짜 넘기기(버튼·옆으로 쓸기, Todo 캘린더 방식)
 
 let writeFields = []; // 지금 그린 칸 목록 (칸 순서 = data-f 번호)
 
@@ -22,7 +22,7 @@ function writeHtml() {
       </div>
     </header>
     <div class="date-bar">
-      <button type="button" class="date-title" data-pick aria-label="날짜 고르기">${dateLabel(k)}</button>
+      <button type="button" class="date-title" data-pick aria-label="날짜 고르기">${dateLabel(k)}${holidayName(k) ? ` <em class="holiday">${holidayName(k)}</em>` : ''}</button>
       ${isToday ? '' : '<button type="button" class="today-btn" data-today>오늘</button>'}
       <div class="arrows">
         <button class="nav-btn" type="button" data-step="-1" aria-label="전날">${ICONS.back}</button>
@@ -136,7 +136,7 @@ function openDatePicker() {
   showOverlay(dateOverlay);
 }
 function renderDatePicker() {
-  dateCal.innerHTML = calHtml(pickMonth, { sel: ui.sel, pick: true });
+  dateCal.innerHTML = calHtml(pickMonth, { pick: true });
 }
 dateCal.addEventListener('click', e => {
   const b = e.target.closest('button');

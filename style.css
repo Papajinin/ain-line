@@ -1,4 +1,4 @@
-/* AIN Line 스타일 v5 — 색·크기는 ../ain-todo/plan/design-guide.md(공통 디자인 가이드)를 따른다. 기본 틀은 AIN Days와 같음 */
+/* AIN Line 스타일 v6 — 색·크기는 ../ain-todo/plan/design-guide.md(공통 디자인 가이드)를 따른다. 기본 틀은 AIN Days와 같음 */
 
 :root {
   --bg: #F2F2F7;
@@ -26,7 +26,7 @@
   --ease: cubic-bezier(.22, .61, .36, 1); /* 움직임: 처음엔 빠르게, 끝에서 천천히 멈춤 (네 앱 공통) */
   --t: .45s; /* 이 앱의 모든 움직임 속도 (Line은 일기라 조금 더 천천히) */
   --t-press: .1s; /* 누르는 순간만 바로 반응 */
-  --has-mix: 16%; /* 달력에서 쓴 날 동그라미 진하기 */
+  --has-mix: 20%; /* 달력에서 쓴 날 동그라미 진하기 (라이트·다크 같게, AIN Todo 고른 날과 같음) */
   color-scheme: light;
 }
 
@@ -42,7 +42,6 @@
     --seg-active: #636366;
     --splash-bg: #000000;
     --primary-text: #409CFF;
-    --has-mix: 30%;
 
     --c-blue: #0A84FF;
     --c-green: #30D158;
@@ -65,7 +64,6 @@
   --seg-active: #636366;
   --splash-bg: #000000;
   --primary-text: #409CFF;
-  --has-mix: 30%;
 
   --c-blue: #0A84FF;
   --c-green: #30D158;
@@ -147,6 +145,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 /* ---------- 날짜 줄 (쓰기) ---------- */
 .date-bar { display: flex; align-items: center; padding: 4px 6px 8px 20px; }
 .date-title { font-size: 17px; font-weight: 700; height: 44px; text-align: left; }
+.date-title .holiday { font-style: normal; color: var(--c-red); }
 .date-bar .today-btn { margin-left: 10px; height: 28px; padding: 0 10px; border-radius: 14px; background: var(--fill); color: var(--primary-text); font-size: 14px; }
 .date-bar .arrows { margin-left: auto; display: flex; }
 .nav-btn { width: 44px; height: 44px; display: grid; place-items: center; color: var(--sub); }
@@ -206,8 +205,9 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .cd .n { width: 34px; height: 34px; border-radius: 17px; display: grid; place-items: center; transition: background-color var(--t) var(--ease); }
 /* 쓴 날: 은은한 테마 색 동그라미 */
 .cd.has .n { background: color-mix(in srgb, var(--primary) var(--has-mix), transparent); }
+.cd.red .n { color: var(--c-red); } /* 일요일·공휴일 */
 .cd.today .n { color: var(--primary-text); font-weight: 700; }
-.cd.sel .n { background: var(--primary); color: var(--on-primary); font-weight: 600; }
+.cd.today.red .n { color: var(--c-red); }
 .cd:disabled { color: var(--sub); opacity: .45; }
 
 /* 그달 목록 */
@@ -216,6 +216,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; 
 .li { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 6px 12px 6px 16px; text-align: left; }
 .li + .li { border-top: 0.5px solid var(--line); }
 .li .d { flex: none; width: 58px; font-size: 14px; color: var(--sub); }
+.li .d.red, .rh .num.red { color: var(--c-red); } /* 돌아보기 목록·찾기 결과의 일요일·공휴일 */
 .li .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .li > svg { flex: none; width: 16px; height: 16px; color: var(--sub); stroke-width: 2.4; }
 

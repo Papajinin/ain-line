@@ -21,7 +21,7 @@
   <script>
     // 새 버전 스스로 받기 (네 앱 공통): 켤 때 서버의 version.txt 숫자가 아래 APP_VERSION보다 크면
     // 새 화면 파일을 받아 한 번 새로고침. 올릴 때마다 두 숫자를 같이 올린다
-    const APP_VERSION = 4;
+    const APP_VERSION = 5;
     (function () {
       const t0 = Date.now();
       const key = 'ainLine.updated'; // 같은 버전으로 두 번 새로고침하지 않게
@@ -37,7 +37,7 @@
         .catch(() => {}); // 인터넷이 안 되면 그냥 염
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
   <!-- 시작 화면 (앱을 새로 열 때만, 약 2초): 파란 원이 펼쳐지고 → 글 세 줄이 한 줄씩 쓰임 → 이름 → 색 점 4개 (네 앱 공통 순서) -->
@@ -183,9 +183,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="app.js?v=3"></script>
-  <script src="write.js?v=3"></script>
-  <script src="recall.js?v=1"></script>
+  <script src="https://papajinin.github.io/ain-todo/holidays.js"></script>
+  <script src="app.js?v=4"></script>
+  <script src="write.js?v=4"></script>
+  <script src="recall.js?v=2"></script>
   <script src="sheet.js?v=1"></script>
   <script src="settings.js?v=1"></script>
   <script src="sync.js?v=2"></script>
